@@ -8,66 +8,91 @@ import {
   SafeAreaView,
   Dimensions,
   Image,
+  ActivityIndicator,
   Pressable,
-  ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
 const { width, height } = Dimensions.get('window');
 
-const GenerateScreen = () => {
+const index = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [hover, setHover] = useState(false);
+  const [credits, setCredits] = useState(100); // Initial credits set to 100
+  const [imageClicked, setImageClicked] = useState(false); // State to track image click
 
-  const handleGenerate = () => {
-    setGeneratedImage('https://via.placeholder.com/400x300.png?text=AI+Generated+Image');
+  const handleGenerate = async () => {
+    if (credits > 0) {
+      setLoading(true);
+      setGeneratedImage(null);
+
+      // Simulate generation delay
+      setTimeout(() => {
+        setGeneratedImage('https://via.placeholder.com/400x300.png?text=AI+Generated+Image');
+        setCredits(credits - 1); // Decrease credits after each image generation
+        setLoading(false);
+      }, 2000);
+    } else {
+      alert('You are out of credits! Please purchase more.');
+    }
   };
 
   const handleDownload = () => {
     alert('Downloading image...');
+    // You can implement actual download logic here
+  };
+
+  const handleImageClick = () => {
+    setImageClicked(!imageClicked); // Toggle the state on image click
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.heading}>AI Image Generator</Text>
+      <View style={styles.inner}>
+        {/* Credits section */}
+        <View style={styles.creditsContainer}>
+          <Text style={styles.creditsText}>Credits: {credits}</Text>
+        </View>
 
-        {/* Prompt Input */}
+        <Text style={styles.heading}>🎨 AI Image Generator</Text>
+
         <TextInput
           style={styles.input}
-          placeholder="Describe your image idea..."
-          placeholderTextColor="#888"
+          placeholder="Imagine something amazing..."
+          placeholderTextColor="#aaa"
           value={prompt}
           onChangeText={setPrompt}
           multiline
         />
 
-        {/* Generate Button */}
-        <TouchableOpacity style={styles.generateBtn} onPress={handleGenerate}>
-          <Text style={styles.btnText}>Generate Image</Text>
+        <TouchableOpacity style={styles.generateBtn} onPress={handleGenerate} disabled={loading}>
+          <Text style={styles.btnText}>{loading ? 'Generating...' : 'Generate'}</Text>
         </TouchableOpacity>
 
-        {/* Image Box */}
         <Pressable
           onLongPress={() => setHover(true)}
           onPressOut={() => setHover(false)}
-          style={styles.imageContainer}
+          onPress={handleImageClick} // Add onPress to handle image click
+          style={styles.imageBox}
         >
-          {generatedImage ? (
+          {loading ? (
+            <ActivityIndicator size="large" color="#5c9eff" />
+          ) : generatedImage ? (
             <>
               <Image source={{ uri: generatedImage }} style={styles.image} />
-              {hover && (
+              {imageClicked && ( // Show the download button only when the image is clicked
                 <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
-                  <Icon name="download" size={24} color="#333" />
+                  <Icon name="download" size={22} color="#444" />
                 </TouchableOpacity>
               )}
             </>
           ) : (
-            <Text style={styles.placeholderText}>Your image will appear here</Text>
+            <Text style={styles.placeholder}>Generated image will appear here</Text>
           )}
         </Pressable>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -75,84 +100,95 @@ const GenerateScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f4f7',
+    backgroundColor: '#fafafa',
   },
-  content: {
-    padding: 20,
+  inner: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 30,
+    paddingBottom: 20,
+    justifyContent: 'space-between',
+  },
+  creditsContainer: {
     alignItems: 'center',
-    minHeight: height,
+    marginBottom: 10,
+  },
+  creditsText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#444',
   },
   heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: '#222',
-    marginBottom: 20,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   input: {
-    width: '100%',
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
     fontSize: 16,
-    minHeight: height * 0.15,
+    borderColor: '#e2e2e2',
     borderWidth: 1,
-    borderColor: '#ddd',
+    height: height * 0.16,
     textAlignVertical: 'top',
-    marginBottom: 20,
+    shadowColor: '#ccc',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
   generateBtn: {
-    backgroundColor: '#4c8bf5',
+    backgroundColor: '#5c9eff',
     paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    width: '100%',
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 30,
-    shadowColor: '#4c8bf5',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 3 },
+    marginTop: 16,
+    shadowColor: '#5c9eff',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 3,
   },
   btnText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
-  imageContainer: {
-    width: '100%',
-    height: height * 0.35,
-    backgroundColor: '#e5e5e5',
+  imageBox: {
+    backgroundColor: '#f0f0f0',
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    height: height * 0.35,
+    marginTop: 24,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   image: {
     width: '100%',
     height: '100%',
     borderRadius: 16,
   },
-  placeholderText: {
-    fontSize: 16,
-    color: '#888',
+  placeholder: {
+    color: '#aaa',
+    fontSize: 15,
   },
   downloadBtn: {
     position: 'absolute',
     top: 12,
     right: 12,
     backgroundColor: '#fff',
-    borderRadius: 50,
+    borderRadius: 100,
     padding: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 4,
   },
 });
 
-export default GenerateScreen;
+export default index;
