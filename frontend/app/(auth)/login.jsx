@@ -99,7 +99,7 @@ const Login = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <Text style={styles.versionText}>Version 1.0 • © 2023</Text>
+      <Text style={styles.versionText}>Version 1.0</Text>
     </SafeAreaView>
   );
 };
