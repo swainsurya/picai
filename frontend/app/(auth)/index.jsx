@@ -15,6 +15,7 @@ import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { ActivityIndicator } from 'react-native';
+import { Link } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
@@ -113,7 +114,7 @@ const Signup = () => {
 
                 <View style={styles.loginLinkContainer}>
                   <Text style={styles.loginText}>Already have an account? </Text>
-                  <Text style={styles.loginLink}>Login</Text>
+                  <Link href={"/login"} style={styles.loginLink}>Login</Link>
                 </View>
               </View>
             )}

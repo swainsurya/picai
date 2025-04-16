@@ -87,6 +87,13 @@ export const genImage = async (req, res) => {
         })
     }
     try {
+        const user = await userModel.findById(userid);
+        if(user?.credits <= 0){
+            return res.status(400).json({
+                message: "Insufficient Credits, buy credits",
+                status: false
+            })
+        }
         const img = await generateImage(text);
         if (!img) {
             return res.json({
@@ -97,6 +104,8 @@ export const genImage = async (req, res) => {
         const image = `data:image/png;base64,${img.toString("base64")}`
         const userPrompt = new promptModel({ text, ownerID: userid });
         userPrompt.save();
+        user.credits -= 1;
+        await user.save();
         return res.json({
             message: "Image generated",
             prompt: text,

@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React from 'react';
 import {
   StyleSheet,
@@ -26,51 +26,80 @@ const Login = () => {
         <ScrollView
           contentContainerStyle={styles.innerContainer}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          {/* Logo */}
+          {/* Logo Section */}
           <View style={styles.logoContainer}>
             <Image
               style={styles.logo}
               resizeMode="contain"
               source={require('@/assets/images/login_img.png')}
             />
+            <Text style={styles.welcomeText}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Sign in to continue</Text>
           </View>
 
           {/* Login Form */}
           <View style={styles.loginContainer}>
-            <Text style={styles.loginTitle}>Login</Text>
+            {/* Email Field */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                style={styles.inputBox}
+                placeholder="Enter your email"
+                placeholderTextColor="#A1A5B7"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
-            <TextInput
-              style={styles.inputBox}
-              placeholder="Email ID"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-            />
-            <TextInput
-              style={styles.inputBox}
-              placeholder="Password"
-              placeholderTextColor="#999"
-              secureTextEntry
-            />
+            {/* Password Field */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Password</Text>
+              <TextInput
+                style={styles.inputBox}
+                placeholder="Enter your password"
+                placeholderTextColor="#A1A5B7"
+                secureTextEntry
+              />
+              <TouchableOpacity style={styles.forgotBtn}>
+                <Text style={styles.forgotText}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity style={styles.forgotBtn}>
-              <Text style={styles.forgotText}>Forgot Password?</Text>
-            </TouchableOpacity>
-
+            {/* Login Button */}
             <TouchableOpacity style={styles.loginButton}>
               <Text style={styles.loginButtonText}>Sign In</Text>
             </TouchableOpacity>
 
+            {/* Divider */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Social Login */}
+            <View style={styles.socialContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image 
+                  source={require('@/assets/images/login_img.png')} 
+                  style={styles.socialIcon}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign Up Link */}
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an account?</Text>
-              <TouchableOpacity>
-                <Link href={"/"} style={styles.signupLink}> Sign up</Link>
+              <TouchableOpacity onPress={()=>router.back()}>
+                <Text style={styles.signupLink}> Sign up</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <Text style={styles.versionText}>Version 1.0</Text>
+      <Text style={styles.versionText}>Version 1.0 • © 2023</Text>
     </SafeAreaView>
   );
 };
@@ -78,94 +107,148 @@ const Login = () => {
 export default Login;
 
 const styles = StyleSheet.create({
-    main: {
-      flex: 1,
-      backgroundColor: '#F4F6F8',
-    },
-    innerContainer: {
-      alignItems: 'center',
-      padding: 20,
-    },
-    logoContainer: {
-      width: '100%',
-      height: height * 0.3,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    logo: {
-      width: '80%',
-      height: '100%',
-    },
-    loginContainer: {
-      width: '100%',
-      backgroundColor: '#FFFFFF',
-      borderRadius: 12,
-      padding: 20,
-      elevation: 5,
-      shadowColor: '#00000022',
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-    },
-    loginTitle: {
-      fontSize: 26,
-      fontWeight: '700',
-      marginBottom: 20,
-      color: '#1C1C1E',
-      alignSelf: 'center',
-    },
-    inputBox: {
-      width: '100%',
-      padding: 12,
-      borderRadius: 8,
-      borderWidth: 1.5,
-      borderColor: '#D1D5DB',
-      marginBottom: 15,
-      fontSize: 16,
-      color: '#1C1C1E',
-      backgroundColor: '#F9FAFB',
-    },
-    forgotBtn: {
-      alignSelf: 'flex-end',
-      marginBottom: 15,
-    },
-    forgotText: {
-      color: '#5568FE',
-      fontWeight: '500',
-    },
-    loginButton: {
-      backgroundColor: '#5568FE',
-      paddingVertical: 12,
-      borderRadius: 8,
-      alignItems: 'center',
-      marginTop: 5,
-    },
-    loginButtonText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-    signupContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginTop: 15,
-    },
-    signupText: {
-      fontSize: 14,
-      color: '#1C1C1E',
-    },
-    signupLink: {
-      fontSize: 14,
-      color: '#5568FE',
-      fontWeight: '600',
-    },
-    versionText: {
-        position: 'absolute',
-        bottom: 10,
-        alignSelf: 'center',
-        color: '#A0A4A8',
-        fontSize: 14,
-      }
-      
-  });
-  
+  main: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  innerContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  logoContainer: {
+    width: '100%',
+    height: height * 0.3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 24,
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1A1D1F',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6F767E',
+    fontWeight: '500',
+  },
+  loginContainer: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+  },
+  inputContainer: {
+    marginBottom: 24,
+  },
+  inputLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A1D1F',
+    marginBottom: 8,
+  },
+  inputBox: {
+    width: '100%',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
+    backgroundColor: '#FCFCFC',
+    fontSize: 15,
+    color: '#1A1D1F',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  forgotBtn: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+  },
+  forgotText: {
+    color: '#2A85FF',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  loginButton: {
+    backgroundColor: '#2A85FF',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: '#2A85FF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#EFEFEF',
+  },
+  dividerText: {
+    paddingHorizontal: 12,
+    color: '#6F767E',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: 24,
+  },
+  socialButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  signupText: {
+    fontSize: 15,
+    color: '#6F767E',
+  },
+  signupLink: {
+    fontSize: 15,
+    color: '#2A85FF',
+    fontWeight: '600',
+  },
+  versionText: {
+    position: 'absolute',
+    bottom: 24,
+    alignSelf: 'center',
+    color: '#9A9FA5',
+    fontSize: 12,
+    fontWeight: '500',
+  }
+});
