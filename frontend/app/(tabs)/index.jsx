@@ -6,189 +6,271 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
   Image,
   ActivityIndicator,
-  Pressable,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
-
-const index = () => {
+const Index = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [hover, setHover] = useState(false);
-  const [credits, setCredits] = useState(100); // Initial credits set to 100
-  const [imageClicked, setImageClicked] = useState(false); // State to track image click
+  const [credits, setCredits] = useState(100);
+  const [showDownload, setShowDownload] = useState(false);
 
   const handleGenerate = async () => {
-    if (credits > 0) {
-      setLoading(true);
-      setGeneratedImage(null);
-
-      // Simulate generation delay
-      setTimeout(() => {
-        setGeneratedImage('https://via.placeholder.com/400x300.png?text=AI+Generated+Image');
-        setCredits(credits - 1); // Decrease credits after each image generation
-        setLoading(false);
-      }, 2000);
-    } else {
-      alert('You are out of credits! Please purchase more.');
+    if (!prompt.trim()) {
+      alert('Please enter a prompt');
+      return;
     }
+    
+    if (credits <= 0) {
+      alert('You are out of credits! Please purchase more.');
+      return;
+    }
+
+    Keyboard.dismiss();
+    setLoading(true);
+    setGeneratedImage(null);
+    setShowDownload(false);
+
+    // Simulate API call
+    setTimeout(() => {
+      setGeneratedImage('https://source.unsplash.com/random/800x600/?ai,art,' + 
+        encodeURIComponent(prompt));
+      setCredits(credits - 1);
+      setLoading(false);
+    }, 2000);
   };
 
   const handleDownload = () => {
-    alert('Downloading image...');
-    // You can implement actual download logic here
-  };
-
-  const handleImageClick = () => {
-    setImageClicked(!imageClicked); // Toggle the state on image click
+    alert('Image downloaded!');
+    setShowDownload(false);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
-        {/* Credits section */}
-        <View style={styles.creditsContainer}>
-          <Text style={styles.creditsText}>Credits: {credits}</Text>
+    <LinearGradient colors={['#f8f9fa', '#e9ecef']} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Pic-AI</Text>
+          <View style={styles.creditBadge}>
+            <Icon name="zap" size={16} color="#f8f9fa" />
+            <Text style={styles.creditText}>{credits}</Text>
+          </View>
         </View>
 
-        <Text style={styles.heading}>🎨 AI Image Generator</Text>
+        {/* Main Content */}
+        <View style={styles.content}>
+          {/* Prompt Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Describe your vision..."
+            placeholderTextColor="#adb5bd"
+            value={prompt}
+            onChangeText={setPrompt}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Imagine something amazing..."
-          placeholderTextColor="#aaa"
-          value={prompt}
-          onChangeText={setPrompt}
-          multiline
-        />
+          {/* Generate Button */}
+          <TouchableOpacity 
+            style={[
+              styles.generateButton,
+              loading && styles.disabledButton
+            ]} 
+            onPress={handleGenerate}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <Icon name="sparkles" size={18} color="#fff" />
+                <Text style={styles.buttonText}>Generate Art</Text>
+              </>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.generateBtn} onPress={handleGenerate} disabled={loading}>
-          <Text style={styles.btnText}>{loading ? 'Generating...' : 'Generate'}</Text>
-        </TouchableOpacity>
-
-        <Pressable
-          onLongPress={() => setHover(true)}
-          onPressOut={() => setHover(false)}
-          onPress={handleImageClick} // Add onPress to handle image click
-          style={styles.imageBox}
-        >
-          {loading ? (
-            <ActivityIndicator size="large" color="#5c9eff" />
-          ) : generatedImage ? (
-            <>
-              <Image source={{ uri: generatedImage }} style={styles.image} />
-              {imageClicked && ( // Show the download button only when the image is clicked
-                <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
-                  <Icon name="download" size={22} color="#444" />
-                </TouchableOpacity>
-              )}
-            </>
-          ) : (
-            <Text style={styles.placeholder}>Generated image will appear here</Text>
-          )}
-        </Pressable>
-      </View>
-    </SafeAreaView>
+          {/* Image Preview */}
+          <View style={styles.imageContainer}>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#6c757d" />
+                <Text style={styles.loadingText}>Creating your masterpiece...</Text>
+              </View>
+            ) : generatedImage ? (
+              <>
+                <Pressable 
+                  onPress={() => setShowDownload(!showDownload)}
+                  style={styles.imageWrapper}
+                >
+                  <Image 
+                    source={{ uri: generatedImage }} 
+                    style={styles.image} 
+                    resizeMode="cover"
+                  />
+                </Pressable>
+                {showDownload && (
+                  <TouchableOpacity 
+                    style={styles.downloadButton}
+                    onPress={handleDownload}
+                  >
+                    <Icon name="download" size={20} color="#fff" />
+                  </TouchableOpacity>
+                )}
+              </>
+            ) : (
+              <View style={styles.placeholderContainer}>
+                <Icon name="image" size={48} color="#ced4da" />
+                <Text style={styles.placeholderText}>
+                  Your generated artwork will appear here
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
   },
-  inner: {
+  safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 30,
-    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  creditsContainer: {
     alignItems: 'center',
-    marginBottom: 10,
+    padding: 20,
+    paddingTop: 10,
   },
-  creditsText: {
-    fontSize: 18,
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#212529',
+    letterSpacing: 0.5,
+  },
+  creditBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#495057',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  creditText: {
+    color: '#f8f9fa',
+    fontSize: 14,
     fontWeight: '600',
-    color: '#444',
+    marginLeft: 5,
   },
-  heading: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#222',
-    marginBottom: 10,
-    alignSelf: 'center',
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   input: {
     backgroundColor: '#fff',
     borderRadius: 14,
     padding: 16,
     fontSize: 16,
-    borderColor: '#e2e2e2',
+    color: '#212529',
     borderWidth: 1,
-    height: height * 0.16,
+    borderColor: '#dee2e6',
+    minHeight: 120,
+    marginBottom: 20,
     textAlignVertical: 'top',
-    shadowColor: '#ccc',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
-  },
-  generateBtn: {
-    backgroundColor: '#5c9eff',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 16,
-    shadowColor: '#5c9eff',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 2,
   },
-  btnText: {
+  generateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4361ee',
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    gap: 10,
+    shadowColor: '#4361ee',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  disabledButton: {
+    backgroundColor: '#94a3b8',
+  },
+  buttonText: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600',
   },
-  imageBox: {
-    backgroundColor: '#f0f0f0',
+  imageContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
     borderRadius: 16,
-    height: height * 0.35,
-    marginTop: 24,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    gap: 15,
+  },
+  loadingText: {
+    color: '#6c757d',
+    fontSize: 16,
+  },
+  imageWrapper: {
+    flex: 1,
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 16,
   },
-  placeholder: {
-    color: '#aaa',
-    fontSize: 15,
+  placeholderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 15,
+    padding: 20,
   },
-  downloadBtn: {
+  placeholderText: {
+    color: '#adb5bd',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  downloadButton: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: '#fff',
-    borderRadius: 100,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 4,
+    bottom: 20,
+    right: 20,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
-export default index;
+export default Index;
