@@ -7,10 +7,14 @@ import cors from "cors";
 const app = express();
 const port = process.env.PORT || 5000 ;
 
+app.use(cors({
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allowed headers
+}));
 app.use(express.json());
 connectDB();
 
-app.use(cors())
 
 app.use("/auth",userRouter)
 

@@ -1,5 +1,5 @@
 import { Link, router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,10 +13,22 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { useAuth } from '@/store/authStore';
 
 const { width, height } = Dimensions.get('window');
 
 const Login = () => {
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const {loginFunc} = useAuth();
+
+  const handleLogin = async() => {
+    console.log({email, password});
+    loginFunc(email,password);
+  }
+
   return (
     <SafeAreaView style={styles.main}>
       <KeyboardAvoidingView
@@ -50,6 +62,8 @@ const Login = () => {
                 placeholderTextColor="#A1A5B7"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                defaultValue={email}
+                onChangeText={e=>setEmail(e)}
               />
             </View>
 
@@ -61,6 +75,8 @@ const Login = () => {
                 placeholder="Enter your password"
                 placeholderTextColor="#A1A5B7"
                 secureTextEntry
+                defaultValue={password}
+                onChangeText={e=>setPassword(e)}
               />
               <TouchableOpacity style={styles.forgotBtn}>
                 <Text style={styles.forgotText}>Forgot Password?</Text>
@@ -68,7 +84,7 @@ const Login = () => {
             </View>
 
             {/* Login Button */}
-            <TouchableOpacity style={styles.loginButton}>
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
               <Text style={styles.loginButtonText}>Sign In</Text>
             </TouchableOpacity>
 
