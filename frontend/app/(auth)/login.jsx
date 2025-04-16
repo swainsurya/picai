@@ -22,11 +22,20 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const {loginFunc} = useAuth();
+  const { loginFunc } = useAuth();
 
-  const handleLogin = async() => {
-    console.log({email, password});
-    loginFunc(email,password);
+  const handleLogin = async () => {
+    console.log({ email, password });
+    const response = await fetch(`https://picai-djya.onrender.com/auth/login`, {
+      method: "POST",
+      headers: {
+        "Conten-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    })
+    const data = await response.json();
+    console.log(response)
+    console.log(data)
   }
 
   return (
@@ -63,7 +72,7 @@ const Login = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 defaultValue={email}
-                onChangeText={e=>setEmail(e)}
+                onChangeText={e => setEmail(e)}
               />
             </View>
 
@@ -76,7 +85,7 @@ const Login = () => {
                 placeholderTextColor="#A1A5B7"
                 secureTextEntry
                 defaultValue={password}
-                onChangeText={e=>setPassword(e)}
+                onChangeText={e => setPassword(e)}
               />
               <TouchableOpacity style={styles.forgotBtn}>
                 <Text style={styles.forgotText}>Forgot Password?</Text>
@@ -98,8 +107,8 @@ const Login = () => {
             {/* Social Login */}
             <View style={styles.socialContainer}>
               <TouchableOpacity style={styles.socialButton}>
-                <Image 
-                  source={require('@/assets/images/login_img.png')} 
+                <Image
+                  source={require('@/assets/images/login_img.png')}
                   style={styles.socialIcon}
                 />
               </TouchableOpacity>
@@ -108,7 +117,7 @@ const Login = () => {
             {/* Sign Up Link */}
             <View style={styles.signupContainer}>
               <Text style={styles.signupText}>Don't have an account?</Text>
-              <TouchableOpacity onPress={()=>router.back()}>
+              <TouchableOpacity onPress={() => router.back()}>
                 <Text style={styles.signupLink}> Sign up</Text>
               </TouchableOpacity>
             </View>
