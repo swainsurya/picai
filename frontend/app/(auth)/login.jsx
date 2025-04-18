@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -14,7 +15,6 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { useAuth } from '@/store/authStore';
 import { Toast } from 'toastify-react-native';
 import ToastManager from "toastify-react-native"
 
@@ -26,29 +26,24 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { loginFunc } = useAuth();
+  const {user, sayHello} = useAuthStore();
 
   const handleLogin = async () => {
-    console.log({ email, password });
     try {
-      const response = await fetch(`https://picai-djya.onrender.com/auth/login`, {
+      const response = await fetch("https://picai-1i4q.onrender.com/auth/login",{
         method: "POST",
-        headers: {
+        headers:{
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email, password }) // Shorthand when names match
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      console.log(response)
+        body: JSON.stringify({email, password})
+      })
       const data = await response.json();
-      // Handle successful response
+      if(!data.status) {
+        Toast.error(data.message);
+      }
       console.log(data);
     } catch (error) {
-      console.error("Login failed:", error);
-      // Handle error
+      console.log("error ",error)
     }
   }
 
@@ -139,6 +134,7 @@ const Login = () => {
         </ScrollView>
       </KeyboardAvoidingView>
       <Text style={styles.versionText}>Version 1.0</Text>
+      <ToastManager />
     </SafeAreaView>
   );
 };

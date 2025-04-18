@@ -61,6 +61,7 @@ export const login = async (req, res) => {
         const token = await jwt.sign({ userid: user._id }, process.env.JWT_SK, { expiresIn: "2d" });
         return res.status(200).json({
             message: "Login Success",
+            status:true,
             user,
             token
         })
