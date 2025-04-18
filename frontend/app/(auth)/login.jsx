@@ -12,8 +12,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useAuth } from '@/store/authStore';
+import { Toast } from 'toastify-react-native';
+import ToastManager from "toastify-react-native"
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,16 +30,26 @@ const Login = () => {
 
   const handleLogin = async () => {
     console.log({ email, password });
-    const response = await fetch(`https://picai-djya.onrender.com/auth/login`, {
-      method: "POST",
-      headers: {
-        "Conten-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    })
-    const data = await response.json();
-    console.log(response)
-    console.log(data)
+    try {
+      const response = await fetch(`https://picai-djya.onrender.com/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password }) // Shorthand when names match
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      console.log(response)
+      const data = await response.json();
+      // Handle successful response
+      console.log(data);
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Handle error
+    }
   }
 
   return (
