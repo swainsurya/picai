@@ -5,7 +5,7 @@ import { generateImage } from "../utils/generateImg.js";
 import { promptModel } from "../models/prompt.model.js";
 
 export const register = async (req, res) => {
-    const { email, password } = req.body;
+    const { fullname,email, password } = req.body;
     if (!email || !password) {
         return res.json({
             message: "All fields are required"
@@ -25,7 +25,7 @@ export const register = async (req, res) => {
             })
         }
         const hashedPass = bcrypt.hashSync(password, 10);
-        const newUser = new userModel({ email, password: hashedPass });
+        const newUser = new userModel({fullname, email, password: hashedPass });
         await newUser.save();
         return res.status(200).json({
             message: "Registration Success",

@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/store/authStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -14,6 +15,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import ToastManager from "toastify-react-native"
@@ -26,25 +28,15 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const {user, sayHello} = useAuthStore();
+  const {loginFunc, isLoading} = useAuthStore();
 
   const handleLogin = async () => {
-    try {
-      const response = await fetch("https://picai-1i4q.onrender.com/auth/login",{
-        method: "POST",
-        headers:{
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({email, password})
-      })
-      const data = await response.json();
-      if(!data.status) {
-        Toast.error(data.message);
-      }
-      console.log(data);
-    } catch (error) {
-      console.log("error ",error)
+    const res = await loginFunc(email, password);
+    if(!res.success) {
+      Toast.error(res.error)
+      return;
     }
+    Toast.success("login success");
   }
 
   return (
@@ -103,7 +95,9 @@ const Login = () => {
 
             {/* Login Button */}
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Sign In</Text>
+              {
+                isLoading?(<ActivityIndicator color={"white"} size={"small"}/>):(<Text style={styles.loginButtonText}>Sign In</Text>)
+              }
             </TouchableOpacity>
 
             {/* Divider */}
