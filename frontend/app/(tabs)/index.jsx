@@ -36,7 +36,11 @@ const Index = () => {
         body: JSON.stringify({ token, text: prompt })
       })
       const data = await response.json();
-      console.log(data);
+      if(!data.status) {
+        Toast.error("Image not generated");
+        return;
+      }
+      setGeneratedImage(data.image);
     } catch (error) {
       console.log(error);
     }

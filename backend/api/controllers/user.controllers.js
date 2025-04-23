@@ -102,7 +102,7 @@ export const genImage = async (req, res) => {
             })
         }
         
-        const image = `data:image/png;base64,${img.toString("base64")}`
+        const image = `data:image/png;base64,${await img.toString("base64")}`
         const userPrompt = new promptModel({ text, ownerID: userid });
         userPrompt.save();
         user.credits -= 1;
