@@ -13,7 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '@/store/authStore';
-import ToastManager,{ Toast } from 'toastify-react-native';
+import ToastManager, { Toast } from 'toastify-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Index = () => {
@@ -21,22 +21,30 @@ const Index = () => {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [credits, setCredits] = useState(100);
   const [showDownload, setShowDownload] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
-  const {generateImage, isLoading} = useAuthStore();
 
   const handleGenerate = async () => {
-    const token = await AsyncStorage.getItem("token");
-    console.log(token)
-    const text = prompt;
-    console.log(prompt)
-    const res = await generateImage(token,text);
-    if(!res.success) {
-      console.log(res)
-      Toast.error("Server busy try again later");
-      return;
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch("https://picai-1i4q.onrender.com/auth/genimg", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token, text: prompt })
+      })
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
     }
-    setGeneratedImage(res?.img);
-  };
+    finally{
+      setLoading(false);
+    }
+  }
+
 
   const handleDownload = () => {
     alert('Image downloaded!');
@@ -70,11 +78,11 @@ const Index = () => {
           />
 
           {/* Generate Button */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
               styles.generateButton,
               isLoading && styles.disabledButton
-            ]} 
+            ]}
             onPress={handleGenerate}
             disabled={isLoading}
             activeOpacity={0.8}
@@ -98,18 +106,18 @@ const Index = () => {
               </View>
             ) : generatedImage ? (
               <>
-                <Pressable 
+                <Pressable
                   onPress={() => setShowDownload(!showDownload)}
                   style={styles.imageWrapper}
                 >
-                  <Image 
-                    source={{ uri: generatedImage }} 
-                    style={styles.image} 
+                  <Image
+                    source={{ uri: generatedImage }}
+                    style={styles.image}
                     resizeMode="cover"
                   />
                 </Pressable>
                 {showDownload && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.downloadButton}
                     onPress={handleDownload}
                   >
