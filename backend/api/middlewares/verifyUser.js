@@ -17,7 +17,6 @@ export const verifyUser = async(req, res, next) => {
         })
     }
     const {userid} = decode;
-    localStorage.setItem("uid",userid);
     req.userid = userid;
     next();
 }

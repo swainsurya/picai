@@ -74,7 +74,7 @@ export const login = async (req, res) => {
 }
 
 export const genImage = async (req, res) => {
-    const userid = localStorage.getItem("uid");
+    const { userid } = req;
     const { text } = req.body;
     if (!userid) {
         return res.status(400).json({
