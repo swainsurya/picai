@@ -16,8 +16,10 @@ import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { ActivityIndicator } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuthStore } from '@/store/authStore';
+import ToastManager,{ Toast } from 'toastify-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,21 +41,15 @@ const SignupSchema = Yup.object().shape({
 });
 
 const index = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const {registerFunc, isLoading} = useAuthStore()
 
-  const handleSignup = (values) => {
-    setIsLoading(true);
-    console.log('Signup Form Data:', values);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      Alert.alert(
-        'Account Created',
-        'Your account has been successfully created!',
-        [{ text: 'OK' }]
-      );
-    }, 1500);
+  const handleSignup = async(values) => {
+    const res = await registerFunc(values);
+    if(!res?.success) {
+      return Toast.error(res.error);
+    }
+    router.replace("/login")
   };
 
   return (
@@ -193,6 +189,7 @@ const index = () => {
           </Formik>
         </ScrollView>
       </KeyboardAvoidingView>
+      <ToastManager/>
     </SafeAreaView>
   );
 };

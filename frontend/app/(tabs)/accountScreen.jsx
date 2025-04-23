@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const AccountScreen = () => {
   // Sample user data
@@ -25,8 +27,16 @@ const AccountScreen = () => {
     { label: 'Purchase Credits', icon: 'zap' },
     { label: 'History', icon: 'clock' },
     { label: 'Help & Support', icon: 'help-circle' },
-    { label: 'Log Out', icon: 'log-out', color: '#ff6b6b' },
+    { label: 'Log Out', icon: 'log-out', color: '#ff6b6b', type: "logout" },
   ];
+
+  const handleItem = async(type) => {
+    if(type =="logout"){
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+      router.replace("../(auth)");
+    }
+  }
 
   return (
     <LinearGradient colors={['#f8f9fa', '#e9ecef']} style={styles.container}>
@@ -70,7 +80,7 @@ const AccountScreen = () => {
         {/* Menu Items */}
         <View style={styles.menuContainer}>
           {menuItems.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.menuItem}>
+            <TouchableOpacity key={index} style={styles.menuItem} onPress={()=>handleItem(item.type)}>
               <View style={styles.menuIconContainer}>
                 <Icon 
                   name={item.icon} 

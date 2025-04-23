@@ -37,6 +37,7 @@ const Login = () => {
       return;
     }
     Toast.success("login success");
+    router.replace("/(tabs)");
   }
 
   return (

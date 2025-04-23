@@ -12,37 +12,30 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuthStore } from '@/store/authStore';
+import ToastManager,{ Toast } from 'toastify-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Index = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [credits, setCredits] = useState(100);
   const [showDownload, setShowDownload] = useState(false);
 
+  const {generateImage, isLoading} = useAuthStore();
+
   const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      alert('Please enter a prompt');
+    const token = await AsyncStorage.getItem("token");
+    console.log(token)
+    const text = prompt;
+    console.log(prompt)
+    const res = await generateImage(token,text);
+    if(!res.success) {
+      console.log(res)
+      Toast.error("Server busy try again later");
       return;
     }
-    
-    if (credits <= 0) {
-      alert('You are out of credits! Please purchase more.');
-      return;
-    }
-
-    Keyboard.dismiss();
-    setLoading(true);
-    setGeneratedImage(null);
-    setShowDownload(false);
-
-    // Simulate API call
-    setTimeout(() => {
-      setGeneratedImage('https://source.unsplash.com/random/800x600/?ai,art,' + 
-        encodeURIComponent(prompt));
-      setCredits(credits - 1);
-      setLoading(false);
-    }, 2000);
+    setGeneratedImage(res?.img);
   };
 
   const handleDownload = () => {
@@ -80,13 +73,13 @@ const Index = () => {
           <TouchableOpacity 
             style={[
               styles.generateButton,
-              loading && styles.disabledButton
+              isLoading && styles.disabledButton
             ]} 
             onPress={handleGenerate}
-            disabled={loading}
+            disabled={isLoading}
             activeOpacity={0.8}
           >
-            {loading ? (
+            {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <>
@@ -98,7 +91,7 @@ const Index = () => {
 
           {/* Image Preview */}
           <View style={styles.imageContainer}>
-            {loading ? (
+            {isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#6c757d" />
                 <Text style={styles.loadingText}>Creating your masterpiece...</Text>
@@ -134,6 +127,7 @@ const Index = () => {
             )}
           </View>
         </View>
+        <ToastManager />
       </SafeAreaView>
     </LinearGradient>
   );
